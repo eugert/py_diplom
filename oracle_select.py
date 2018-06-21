@@ -46,17 +46,28 @@ def write_csv(filename, headers, rows):
     headers - заголовки файла (имена столбцов)
     rows - список строк
     """
-    with open(filename + '.csv', 'w', encoding = 'utf-8') as csv_file:
+    with open(filename + '.csv', 'w', encoding = 'utf-8', newline='') as csv_file:
         fields = headers
         writer = csv.DictWriter(csv_file, fields, delimiter=';')
         writer.writeheader()
-        # print('\n', 'answers_dict', answers_dict, '\n')
-        # dict_items = rows.items()
-        # print('\n','dict_items:', dict_items,'\n')
-        for one_row in rows:
-            print('\n','current_item:', one_row )
+        rows_dict = {}
+        print(rows)
+        for item in rows:
+            print('item: ', item)
+            for thing_num, thing in enumerate(item):
+                print('thing: ', thing)
+                print('thing_num: ', thing_num)
+                # print('headers[thing_num]: ', headers[thing_num])
+                rows_dict[headers[thing_num]] = thing
+            print('current_rows_dict: ', rows_dict)
+            writer.writerow(rows_dict)
+
+        print('rows_dict: ', rows_dict)
+
+        # for one_row in rows_dict:
+        #     print('\n','current_item:', type(one_row), one_row, '\n' )
             # print('answers_dict[one_row]:', answers_dict[one_row])
-            writer.writerow(one_row)
+            # writer.writerow(one_row)
 
 if __name__ == '__main__':
     # args = parse_args()
@@ -78,7 +89,7 @@ if __name__ == '__main__':
     result = oracle_execute(ora_connect, tables['schema_name'],
                             table_name, tables['cols'])
 
-    print(cols, '\n', result)
+    # print(cols, '\n', result)
     # for row in result:
     #     print(row)
 
