@@ -53,10 +53,10 @@ def write_csv(filename, headers, rows):
         rows_dict = {}
         print(rows)
         for item in rows:
-            print('item: ', item)
+            # print('item: ', item)
             for thing_num, thing in enumerate(item):
-                print('thing: ', thing)
-                print('thing_num: ', thing_num)
+                # print('thing: ', thing)
+                # print('thing_num: ', thing_num)
                 # print('headers[thing_num]: ', headers[thing_num])
                 rows_dict[headers[thing_num]] = thing
             print('current_rows_dict: ', rows_dict)
