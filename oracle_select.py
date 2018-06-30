@@ -1,18 +1,10 @@
 # coding = UTF-8
 
-from argparse import ArgumentParser
 import cx_Oracle
 from config import config
 import csv
 
 from tables import tables
-
-def parse_args():
-    parser = ArgumentParser()
-    parser.add_argument('-t', '--table_name')
-    parser.add_argument('-sch', '--schema_name')
-    return parser.parse_args()
-
 
 def oracle_execute(ora_connect, schema_name, table_name, table_cols):
     """выбирает из таблицы оракла данные
@@ -51,28 +43,12 @@ def write_csv(filename, headers, rows):
         writer = csv.DictWriter(csv_file, fields, delimiter=';')
         writer.writeheader()
         rows_dict = {}
-        # print(rows)
         for item in rows:
-            # print('item: ', item)
             for thing_num, thing in enumerate(item):
-                # print('thing: ', thing)
-                # print('thing_num: ', thing_num)
-                # print('headers[thing_num]: ', headers[thing_num])
                 rows_dict[headers[thing_num]] = thing
-            # print('current_rows_dict: ', rows_dict)
             writer.writerow(rows_dict)
 
-        # print('rows_dict: ', rows_dict)
-
-        # for one_row in rows_dict:
-        #     print('\n','current_item:', type(one_row), one_row, '\n' )
-            # print('answers_dict[one_row]:', answers_dict[one_row])
-            # writer.writerow(one_row)
-
 if __name__ == '__main__':
-    # args = parse_args()
-    # table_name = args.table_name
-    # schema_name = args.schema_name
 
     ora_config = config['oracle']
 
@@ -92,7 +68,6 @@ if __name__ == '__main__':
                                 table_name,
                                 current_table['cols']
                                 )
-
         write_csv(table_name, cols, result)
 
     ora_connect.commit()
