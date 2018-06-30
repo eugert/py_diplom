@@ -46,12 +46,12 @@ def write_csv(filename, headers, rows):
     headers - заголовки файла (имена столбцов)
     rows - список строк
     """
-    with open(filename + '.csv', 'w', encoding = 'utf-8', newline='') as csv_file:
+    with open( 'out/' + filename + '.csv', 'w', encoding = 'utf-8', newline='') as csv_file:
         fields = headers
         writer = csv.DictWriter(csv_file, fields, delimiter=';')
         writer.writeheader()
         rows_dict = {}
-        print(rows)
+        # print(rows)
         for item in rows:
             # print('item: ', item)
             for thing_num, thing in enumerate(item):
@@ -59,10 +59,10 @@ def write_csv(filename, headers, rows):
                 # print('thing_num: ', thing_num)
                 # print('headers[thing_num]: ', headers[thing_num])
                 rows_dict[headers[thing_num]] = thing
-            print('current_rows_dict: ', rows_dict)
+            # print('current_rows_dict: ', rows_dict)
             writer.writerow(rows_dict)
 
-        print('rows_dict: ', rows_dict)
+        # print('rows_dict: ', rows_dict)
 
         # for one_row in rows_dict:
         #     print('\n','current_item:', type(one_row), one_row, '\n' )
@@ -84,16 +84,16 @@ if __name__ == '__main__':
                                     password = ora_config['pwd'],
                                     dsn = ora_dsn)
 
-    cols = tables['cols']
-    table_name = tables['table_name']
-    result = oracle_execute(ora_connect, tables['schema_name'],
-                            table_name, tables['cols'])
+    for current_table in tables:
+        cols = current_table['cols']
+        table_name = current_table['table_name']
+        result = oracle_execute(ora_connect,
+                                current_table['schema_name'],
+                                table_name,
+                                current_table['cols']
+                                )
 
-    # print(cols, '\n', result)
-    # for row in result:
-    #     print(row)
-
-    write_csv(table_name, cols, result)
+        write_csv(table_name, cols, result)
 
     ora_connect.commit()
     ora_connect.close()
