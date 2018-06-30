@@ -1,5 +1,7 @@
 # coding = UTF-8
 
+import os
+
 import cx_Oracle
 from config import config
 import csv
@@ -30,16 +32,15 @@ def oracle_execute(ora_connect, schema_name, table_name, table_cols):
     return result
 
 
-def write_csv(table_name, headers, rows):
+def write_csv(file_name, headers, rows):
     """создаёт csv-файл с полученным именем
     и записывает в него полученные данные с полученными заголовками
     вход:
-    table_name - имя таблицы
+    file_name - имя таблицы
     headers - заголовки файла (имена столбцов)
     rows - список строк
     """
-    filename = 'out/' + table_name + '.csv'
-    with open(filename, 'w', encoding = 'utf-8', newline='') as csv_file:
+    with open(file_name + '.csv', 'w', encoding = 'utf-8', newline='') as csv_file:
         fields = headers
         writer = csv.DictWriter(csv_file, fields, delimiter=';')
         writer.writeheader()
@@ -50,20 +51,19 @@ def write_csv(table_name, headers, rows):
             writer.writerow(rows_dict)
 
 
-def write_ctl(table_name, cols, result):
+def write_ctl(file_name, cols, result):
     """создаёт для каждой таблицы ctl - файл
     и записывает в него контрольную информацию:
     количество столбцов
     количество строк
     количествуо столбцов, содержащих NULL
     вход:
-    table_name - имя таблицы
+    file_name - имя таблицы
     cols - заголовки файла (имена столбцов)
     result - список строк
     """
     rownum = len(result)
     colnum = len(cols)
-    filename = 'out/' + table_name + '.ctl'
     fields = ['colnum', 'rownum', 'null_cols']
     null_cols = {}
     for col_num, col in enumerate(cols):
@@ -78,14 +78,28 @@ def write_ctl(table_name, cols, result):
                     'rownum' : rownum,
                     'null_cols' : null_cols_num}
 
-    with open(filename, 'w', encoding = 'utf-8', newline='') as file:
+    with open(file_name + '.ctl', 'w', encoding = 'utf-8', newline='') as file:
         writer = csv.DictWriter(file, fields, delimiter=';')
         writer.writeheader()
         writer.writerow(result_dict)
 
 
+def write_tkt(pkg_name, table_name):
+    with open(pkg_name + '.tkt', 'a', encoding = 'utf-8',
+                newline='') as file:
+        file.write(table_name + '.csv\n')
+
+
 if __name__ == '__main__':
-    print('start!')
+    print('start')
+
+    pkg_name = 'test_pkg'
+    out_folder = 'out/' + pkg_name + '/'
+
+    if os.path.exists(out_folder):
+        shutil.rmtree(out_folder)
+    else:
+        os.makedirs(out_folder)
 
     ora_config = config['oracle']
 
@@ -105,10 +119,11 @@ if __name__ == '__main__':
                                 table_name,
                                 current_table['cols']
                                 )
-        write_csv(table_name, cols, result)
-        write_ctl(table_name, cols, result)
+        write_csv(out_folder + table_name, cols, result)
+        write_ctl(out_folder + table_name, cols, result)
+        write_tkt(out_folder + pkg_name, table_name)
 
     ora_connect.commit()
     ora_connect.close()
 
-    print('end!')
+    print('end')
