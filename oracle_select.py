@@ -93,14 +93,18 @@ def write_tkt(pkg_name, table_name):
 if __name__ == '__main__':
     print('start')
 
+    # константы
     pkg_name = 'test_pkg'
     out_folder = 'out/' + pkg_name + '/'
 
+    # удаление папки, если она уже есть и создание папки,
+    # если её нет
     if os.path.exists(out_folder):
         shutil.rmtree(out_folder)
     else:
         os.makedirs(out_folder)
 
+    # подхватывание конфига из файла и создание подключений
     ora_config = config['oracle']
 
     ora_dsn = cx_Oracle.makedsn( host = ora_config['host'],
@@ -111,6 +115,7 @@ if __name__ == '__main__':
                                     password = ora_config['pwd'],
                                     dsn = ora_dsn)
 
+    # потабличный запуск процедур
     for current_table in tables:
         cols = current_table['cols']
         table_name = current_table['table_name']
@@ -123,6 +128,7 @@ if __name__ == '__main__':
         write_ctl(out_folder + table_name, cols, result)
         write_tkt(out_folder + pkg_name, table_name)
 
+    # закрытие подключенией
     ora_connect.commit()
     ora_connect.close()
 
