@@ -30,15 +30,16 @@ def oracle_execute(ora_connect, schema_name, table_name, table_cols):
     return result
 
 
-def write_csv(filename, headers, rows):
+def write_csv(table_name, headers, rows):
     """создаёт csv-файл с полученным именем
     и записывает в него полученные данные с полученными заголовками
     вход:
-    filename - имя файла
+    table_name - имя таблицы
     headers - заголовки файла (имена столбцов)
     rows - список строк
     """
-    with open( 'out/' + filename + '.csv', 'w', encoding = 'utf-8', newline='') as csv_file:
+    filename = 'out/' + table_name + '.csv'
+    with open(filename, 'w', encoding = 'utf-8', newline='') as csv_file:
         fields = headers
         writer = csv.DictWriter(csv_file, fields, delimiter=';')
         writer.writeheader()
@@ -48,7 +49,43 @@ def write_csv(filename, headers, rows):
                 rows_dict[headers[thing_num]] = thing
             writer.writerow(rows_dict)
 
+
+def write_ctl(table_name, cols, result):
+    """создаёт для каждой таблицы ctl - файл
+    и записывает в него контрольную информацию:
+    количество столбцов
+    количество строк
+    количествуо столбцов, содержащих NULL
+    вход:
+    table_name - имя таблицы
+    cols - заголовки файла (имена столбцов)
+    result - список строк
+    """
+    rownum = len(result)
+    colnum = len(cols)
+    filename = 'out/' + table_name + '.ctl'
+    fields = ['colnum', 'rownum', 'null_cols']
+    null_cols = {}
+    for col_num, col in enumerate(cols):
+        null_cols[col] = 0
+        for row in result:
+            if row[col_num] == None:
+                null_cols[col] = 1
+                break
+
+    null_cols_num = sum(null_cols.values())
+    result_dict = {'colnum' : colnum,
+                    'rownum' : rownum,
+                    'null_cols' : null_cols_num}
+
+    with open(filename, 'w', encoding = 'utf-8', newline='') as file:
+        writer = csv.DictWriter(file, fields, delimiter=';')
+        writer.writeheader()
+        writer.writerow(result_dict)
+
+
 if __name__ == '__main__':
+    print('start!')
 
     ora_config = config['oracle']
 
@@ -69,6 +106,9 @@ if __name__ == '__main__':
                                 current_table['cols']
                                 )
         write_csv(table_name, cols, result)
+        write_ctl(table_name, cols, result)
 
     ora_connect.commit()
     ora_connect.close()
+
+    print('end!')
