@@ -1,5 +1,4 @@
 # coding = UTF-8
-
 import cx_Oracle
 from config import config
 
@@ -21,3 +20,8 @@ def close_oracle_db (ora_connect):
     """ закрытие подключенией """
     ora_connect.commit()
     ora_connect.close()
+
+if __name__ == '__main__':
+    print('start')
+
+    print('end')
