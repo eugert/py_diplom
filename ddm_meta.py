@@ -1,4 +1,5 @@
 # coding = UTF-8
+
 import cx_Oracle
 from oracle_lib import conn_oracle_db, close_oracle_db
 

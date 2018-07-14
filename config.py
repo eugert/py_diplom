@@ -14,4 +14,3 @@ config = {
         'pwd': 'ddm_meta'
     }
 }
-

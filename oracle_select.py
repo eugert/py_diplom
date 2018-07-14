@@ -1,12 +1,16 @@
 # coding = UTF-8
 
-import os
+import os, shutil
 
 import cx_Oracle
 from config import config
 import csv
+from datetime import date
 
-from tables import tables
+# from config import config
+# from tables import tables
+from oracle_lib import conn_oracle_db, close_oracle_db
+from ddm_meta import get_tables_list
 
 def oracle_execute(ora_connect, schema_name, table_name, table_cols):
     """выбирает из таблицы оракла данные
@@ -93,27 +97,24 @@ def write_tkt(pkg_name, table_name):
 if __name__ == '__main__':
     print('start')
 
-    # константы
-    pkg_name = 'test_pkg'
+    # имя пакета и каталога
+    dt_today = date.today()
+    pkg_name = 'test_pkg_' + dt_today.strftime('%Y%m%d')
     out_folder = 'out/' + pkg_name + '/'
+
+    # получение списка таблиц
+    tables = get_tables_list('stream001', 'ddm_meta')
 
     # удаление папки, если она уже есть и создание папки,
     # если её нет
     if os.path.exists(out_folder):
         shutil.rmtree(out_folder)
+        os.makedirs(out_folder)
     else:
         os.makedirs(out_folder)
 
     # подхватывание конфига из файла и создание подключений
-    ora_config = config['oracle']
-
-    ora_dsn = cx_Oracle.makedsn( host = ora_config['host'],
-                                    port = ora_config['port'],
-                                    sid = ora_config['sid']
-                                )
-    ora_connect = cx_Oracle.connect(user = ora_config['user'],
-                                    password = ora_config['pwd'],
-                                    dsn = ora_dsn)
+    ora_connect = conn_oracle_db('oracle')
 
     # потабличный запуск процедур
     for current_table in tables:
