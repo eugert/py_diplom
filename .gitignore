@@ -1,6 +1,7 @@
 # custom (by anton_afonin)
 venv*
 ~*
+out/*
 
 # custom (by gerta)
 .idea

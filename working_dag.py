@@ -136,7 +136,7 @@ if __name__ == '__main__':
     cnopts = pysftp.CnOpts()
     cnopts.hostkeys = None
     with pysftp.Connection('185.188.183.220', username='anton', password='swJml52410Cj', cnopts=cnopts) as sftp:
-        with sftp.cd('/opt/diplom_upload/'):
-            sftp.put_r('/opt/diplom_upload/', out_folder)
+        # with sftp.cd('/opt/diplom_upload/'):
+        sftp.put_r(out_folder, '/opt/diplom_upload/' + pkg_name)
 
     print('end')
